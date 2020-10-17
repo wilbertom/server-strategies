@@ -2,13 +2,14 @@ import pytest
 import requests
 from requests_futures.sessions import FuturesSession
 from concurrent.futures import ThreadPoolExecutor
+import os
 
 
 @pytest.fixture
 def config():
     return {
-        'server': 'http://localhost:1337',
-        'async-pool-size': None,
+        'server': f'http://localhost:{os.environ["PORT"]}',
+        'async-pool-size': int(os.environ.get("POOL_SIZE", '0')),
     }
 
 
@@ -22,7 +23,7 @@ def assertResponses(config, n):
 
 def assertResponsesAsync(config, n):
     pool_size = config['async-pool-size']
-    executor = None if pool_size is None else ThreadPoolExecutor(max_workers=pool_size)
+    executor = ThreadPoolExecutor(max_workers=pool_size)
     session = FuturesSession(executor=executor)
     futures = [session.get(config['server']) for _ in range(0, n)]
 

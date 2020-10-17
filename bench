@@ -2,27 +2,27 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+
+requests=${1:-"1"}
+
 function bench {
     local port=$1
-    local test=$2
+    local mode=$2
     local pool_size=${3:-"0"}
 
-    local t1=$(PORT="${port}" POOL_SIZE="${pool_size}" pytest tests/server_test.py::"${test}" | grep 'passed' | awk '{print $5}')
+    local t1=$(MODE=${mode} REQUESTS=$requests PORT="${port}" POOL_SIZE="${pool_size}" pytest tests/server_test.py | grep 'passed' | awk '{print $5}')
     kill -10 $(lsof -t -R -i tcp:${port} | sort | head -n 1 ) # server cleanup
 
     echo "$t1"
 }
 
-requests=${1:-"1"}
-
-sync="test_getting_hello_world_message_${requests}_times"
-async="test_getting_hello_world_message_${requests}_times_async"
 
 echo "     |Handler        | Sync   | Async(4) | Async(8) | Requests |"
 echo "     |---------------|--------|----------|----------|----------|"
-echo "     |Serial         | $(bench 1300 $sync)  | $(bench 1300 $async 4)    | $(bench 1300 $async 8)    | $(printf '%-8s' ${requests}) |"
-echo "     |Forking        | $(bench 1400 $sync)  | $(bench 1400 $async 4)    | $(bench 1400 $async 8)    | $(printf '%-8s' ${requests}) |"
-echo "     |Pre Forking 2  | $(bench 1500 $sync)  | $(bench 1500 $async 4)    | $(bench 1500 $async 8)    | $(printf '%-8s' ${requests}) |"
-echo "     |Pre Forking 4  | $(bench 1600 $sync)  | $(bench 1500 $async 4)    | $(bench 1500 $async 8)    | $(printf '%-8s' ${requests}) |"
-echo "     |Pre Forking 8  | $(bench 1700 $sync)  | $(bench 1500 $async 4)    | $(bench 1500 $async 8)    | $(printf '%-8s' ${requests}) |"
-echo "     |Pre Forking 12 | $(bench 1800 $sync)  | $(bench 1500 $async 4)    | $(bench 1500 $async 8)    | $(printf '%-8s' ${requests}) |"
+echo "     |Serial         | $(bench 1300 sync)  | $(bench 1300 async 4)    | $(bench 1300 async 8)    | $(printf '%-8s' ${requests}) |"
+echo "     |Forking        | $(bench 1400 sync)  | $(bench 1400 async 4)    | $(bench 1400 async 8)    | $(printf '%-8s' ${requests}) |"
+echo "     |Pre Forking 2  | $(bench 1500 sync)  | $(bench 1500 async 4)    | $(bench 1500 async 8)    | $(printf '%-8s' ${requests}) |"
+echo "     |Pre Forking 4  | $(bench 1600 sync)  | $(bench 1600 async 4)    | $(bench 1600 async 8)    | $(printf '%-8s' ${requests}) |"
+echo "     |Pre Forking 8  | $(bench 1700 sync)  | $(bench 1700 async 4)    | $(bench 1700 async 8)    | $(printf '%-8s' ${requests}) |"
+echo "     |Pre Forking 12 | $(bench 1800 sync)  | $(bench 1800 async 4)    | $(bench 1800 async 8)    | $(printf '%-8s' ${requests}) |"
+echo "     |Thread         | $(bench 1900 sync)  | $(bench 1900 async 4)    | $(bench 1900 async 8)    | $(printf '%-8s' ${requests}) |"

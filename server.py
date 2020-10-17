@@ -5,10 +5,9 @@ from httpservers import Server, HANDLERS
 
 
 def main(args):
-    handler_cls = HANDLERS[args.handler]
-    handler = handler_cls()
+    handler_cls, *handler_args = HANDLERS[args.handler]
 
-    server = Server(args.host, args.port, handler)
+    server = Server(args.host, args.port, handler_cls, *handler_args)
 
     server.run()
 

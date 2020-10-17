@@ -1,35 +1,44 @@
 from socket import socket, AF_INET, SOCK_STREAM, SHUT_RDWR
 import os
 import signal
+from .exceptions import HandlerException, HandlerStopped
 
 
 class Server:
 
-    def __init__(self, host, port, handler):
+    def __init__(self, host, port, handler_cls, *handler_args):
         self._host = host
         self._port = port
-        self._handler = handler
         self._backlog = 0
-        self._socket = socket(AF_INET, SOCK_STREAM)
         self._server_pid = os.getpid()
+        self._socket = socket(AF_INET, SOCK_STREAM)
+
+        self._handler_cls = handler_cls
+        self._handler_args = handler_args
+        self._handler = None
 
         signal.signal(signal.SIGUSR1, self._cleanup_signal)
 
     def run(self):
-        self._log(f'running on http://{self._host}:{self._port}')
+        if self._server:
+            self._log(f'listening - http://{self._host}:{self._port}')
 
-        self._socket.bind((self._host, self._port))
-        self._socket.listen(self._backlog)
+            self._socket.bind((self._host, self._port))
+            self._socket.listen(self._backlog)
+
+            self._log('starting handler')
+            self._handler = self._handler_cls(self._socket, *self._handler_args)
 
         while True:
             try:
-                (clientsocket, address) = self._socket.accept()
-                clientsocket.settimeout(60)
-                self._handler.handle(clientsocket, address)
+                self._handler.handle()
 
             except KeyboardInterrupt:
                 self._log(f'keyboard interrupt')
                 break
+            except HandlerException as e:
+                self._log(f'handler - {str(e)}')
+
 
         self.stop()
 
@@ -37,7 +46,12 @@ class Server:
 
     def stop(self):
         self._log(f'stopping')
-        self._handler.cleanup()
+
+        try:
+            self._handler.cleanup()
+        except HandlerStopped as e:
+            self._log('handler - already cleaned up')
+
         self._socket.close()
         self._log(f'stopped')
 

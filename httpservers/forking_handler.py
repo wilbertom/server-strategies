@@ -6,7 +6,8 @@ import sys
 
 class ForkingHandler(Handler):
 
-    def __init__(self):
+    def __init__(self, socket):
+        super().__init__(socket)
         self._pids = []
 
     def cleanup(self):
@@ -14,7 +15,10 @@ class ForkingHandler(Handler):
             pid = self._pids.pop()
             os.waitpid(pid, 0)
 
-    def handle(self, clientsocket, address):
+    def handle(self):
+        (clientsocket, address) = self.socket.accept()
+        clientsocket.settimeout(60)
+
         try:
             pid = os.fork()
 

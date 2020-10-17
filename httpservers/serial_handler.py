@@ -4,12 +4,11 @@ from .handler import Handler
 
 class SerialHandler(Handler):
 
-    def handle(self, clientsocket, address):
-        # print(f"{id(clientsocket)} {address} - handling request from")
+    def handle(self):
+        (clientsocket, address) = self.socket.accept()
+        clientsocket.settimeout(60)
 
         self._send_hello_world(clientsocket)
 
         clientsocket.shutdown(SHUT_RDWR)
         clientsocket.close()
-
-        # print(f"{id(clientsocket)} {address} - handled")

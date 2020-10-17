@@ -6,7 +6,10 @@ class Handler:
 
     """
 
-    def handle(self, clientsocket, address):
+    def __init__(self, socket):
+        self.socket = socket
+
+    def handle(self):
         raise NotImplementedError
 
     def cleanup(self):

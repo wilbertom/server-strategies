@@ -9,7 +9,7 @@ def main(args):
     handler = handler_cls()
 
     server = Server(args.host, args.port, handler)
-    
+
     server.run()
 
     return 0

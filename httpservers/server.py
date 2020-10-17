@@ -16,7 +16,7 @@ class Server:
         signal.signal(signal.SIGUSR1, self._cleanup_signal)
 
     def run(self):
-        print(f'server - {os.getpid()} - running on http://{self._host}:{self._port}')
+        self._log(f'running on http://{self._host}:{self._port}')
 
         self._socket.bind((self._host, self._port))
         self._socket.listen(self._backlog)
@@ -28,7 +28,7 @@ class Server:
                 self._handler.handle(clientsocket, address)
 
             except KeyboardInterrupt:
-                print("\nserver - keyboard interrupt")
+                self._log(f'keyboard interrupt')
                 break
 
         self.stop()
@@ -36,14 +36,19 @@ class Server:
         return
 
     def stop(self):
-        print(f'server - stopping from {os.getpid()}')
+        self._log(f'stopping')
         self._handler.cleanup()
         self._socket.close()
-        print(f'server - stopped from {os.getpid()}')
+        self._log(f'stopped')
 
     def _cleanup_signal(self, *args):
-        print(f'server - cleaning up {args}')
+        self._log(f'cleaning up {args}')
         self._handler.cleanup()
+
+    def _log(self, message):
+        print(f'server - {os.getpid()} - {message}')
+
+        return self
 
     @property
     def _server(self):

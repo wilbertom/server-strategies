@@ -19,12 +19,10 @@ class ForkingHandler(Handler):
             pid = os.fork()
 
             if pid == 0:
-                self._log('handling request')
                 self._send_hello_world(clientsocket)
 
                 clientsocket.shutdown(SHUT_RDWR)
                 clientsocket.close()
-                self._log('handled request')
 
                 sys.exit(0)
 

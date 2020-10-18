@@ -56,7 +56,7 @@ class Server:
         self._log(f'stopped')
 
     def _cleanup_signal(self, *args):
-        self._log(f'cleaning up {args}')
+        self._log(f'clean up signal')
         self._handler.cleanup()
 
     def _log(self, message):

@@ -4,3 +4,7 @@ class HandlerException(Exception):
 
 class HandlerStopped(HandlerException):
     pass
+
+
+class HandlerWriteError(HandlerException):
+    pass

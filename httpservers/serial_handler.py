@@ -8,7 +8,7 @@ class SerialHandler(Handler):
         (clientsocket, address) = self.socket.accept()
         clientsocket.settimeout(60)
 
-        self._send_hello_world(clientsocket)
+        self._send_response(clientsocket)
 
         clientsocket.shutdown(SHUT_RDWR)
         clientsocket.close()

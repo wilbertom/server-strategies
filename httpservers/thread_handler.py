@@ -10,7 +10,7 @@ def _target(handler, clientsocket, address):
     clientsocket.settimeout(60)
 
     try:
-        handler._send_hello_world(clientsocket)
+        handler._send_response(clientsocket)
 
         clientsocket.shutdown(SHUT_RDWR)
         clientsocket.close()

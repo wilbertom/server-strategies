@@ -23,7 +23,7 @@ class ForkingHandler(Handler):
             pid = os.fork()
 
             if pid == 0:
-                self._send_hello_world(clientsocket)
+                self._send_response(clientsocket)
 
                 clientsocket.shutdown(SHUT_RDWR)
                 clientsocket.close()

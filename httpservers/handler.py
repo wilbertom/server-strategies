@@ -1,4 +1,5 @@
 import os
+from .exceptions import HandlerWriteError
 
 
 class Handler:
@@ -15,10 +16,21 @@ class Handler:
     def cleanup(self):
         pass
 
-    def _send_hello_world(self, clientsocket):
-        content = b"hello, world"
-        data = b"HTTP/1.1 200 OK\r\nConnection: close\r\nCONTENT-LENGTH: %d\r\n\r\n%s" % (len(content), content)
-        clientsocket.send(data)
+    def _send_response(self, clientsocket):
+        #                10240 is one chunk in requests library
+        content = b"1" * 10240 * 10
+
+        response = b"HTTP/1.1 200 OK\r\n"
+        response += b"Connection: close\r\n"
+        response += b"CONTENT-LENGTH: %d\r\n" % (len(content), )
+
+        response += b"\r\n"
+        response += b"%s" % (content, )
+
+        result = clientsocket.sendall(response)
+
+        if result is not None:
+            raise HandlerWriteError(f'Failed to write: {result}')
 
     def _log(self, message):
         print(f'client - {os.getpid()} - {message}')

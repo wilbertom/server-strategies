@@ -33,7 +33,7 @@ class PreForkingHandler(Handler):
             clientsocket.settimeout(60)
 
             try:
-                self._send_hello_world(clientsocket)
+                self._send_response(clientsocket)
 
                 clientsocket.shutdown(SHUT_RDWR)
                 clientsocket.close()

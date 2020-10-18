@@ -16,6 +16,14 @@ function bench {
     echo "$t1"
 }
 
+function bombard {
+    local port=$1
+    
+    throughput=$(bombardier "http://localhost:${port}" | grep 'Throughput' | awk '{print $2}')
+    kill -10 $(lsof -t -R -i tcp:${port} | sort | head -n 1 ) # server cleanup
+    echo "${port} - ${throughput}"
+}
+
 
 echo "     |Handler        | Sync   | Async(4) | Async(8) | Requests |"
 echo "     |---------------|--------|----------|----------|----------|"
@@ -26,3 +34,14 @@ echo "     |Pre Forking 4  | $(bench 1600 sync)  | $(bench 1600 async 4)    | $(
 echo "     |Pre Forking 8  | $(bench 1700 sync)  | $(bench 1700 async 4)    | $(bench 1700 async 8)    | $(printf '%-8s' ${requests}) |"
 echo "     |Pre Forking 12 | $(bench 1800 sync)  | $(bench 1800 async 4)    | $(bench 1800 async 8)    | $(printf '%-8s' ${requests}) |"
 echo "     |Thread         | $(bench 1900 sync)  | $(bench 1900 async 4)    | $(bench 1900 async 8)    | $(printf '%-8s' ${requests}) |"
+
+echo
+echo "---------------------------- Bombarding ----------------------------"
+echo $(bombard 1300)
+echo $(bombard 1400)
+echo $(bombard 1500)
+echo $(bombard 1600)
+echo $(bombard 1700)
+echo $(bombard 1800)
+echo $(bombard 1900)
+echo

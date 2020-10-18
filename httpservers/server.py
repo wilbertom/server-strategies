@@ -39,7 +39,6 @@ class Server:
             except HandlerException as e:
                 self._log(f'handler - {str(e)}')
 
-
         self.stop()
 
         return

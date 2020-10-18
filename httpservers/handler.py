@@ -18,7 +18,7 @@ class Handler:
 
     def _send_response(self, clientsocket):
         #                10240 is one chunk in requests library
-        content = b"1" * 10240 * 10
+        content = b"1" * 10240 * 1
 
         response = b"HTTP/1.1 200 OK\r\n"
         response += b"Connection: close\r\n"
